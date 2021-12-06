@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 import utils.CommonMethodsAPI;
 import utils.CustomAnotations.TestDescription;
 import utils.ReadersForConfigs;
+import static org.hamcrest.Matchers.equalTo;
 
 import static io.restassured.RestAssured.*;
 
@@ -95,6 +96,28 @@ public class PostMethods {
                 when().post(ReadersForConfigs.getPropertiesValue("createPerson")).then().extract().response();
 
         Assert.assertEquals(response.statusCode(),201);
+
+    }
+    @TestDescription(def = "IF user wants to create a person with 12 digits,")
+    @Test
+    public void createPersonwith11DIGITSerror400() throws Exception{
+        RestAssured.baseURI= ReadersForConfigs.getPropertiesValue("base.URI");
+
+        Person person1=new Person(24,"Evindar","Pre","12355566770000");
+        ObjectMapper objectMapper=new ObjectMapper();
+        String personbody=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(person1);
+
+
+        Response response= given().auth().basic("admin","testPassword").
+                header("Content-Type","application/json").
+                body(personbody).
+                when().post("/v1/post-person").then().log().body().log().status().extract().response();
+
+        Assert.assertEquals(response.statusCode(),400);
+
+
+
+
 
     }
 
